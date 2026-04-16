@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🇯🇵 2026 仙台馬拉松・東北之旅</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F9F6F0; /* 溫暖的米白色 */
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-main: #333333;
+            --text-light: #666666;
+            
+            /* 每日專屬主題色 */
+            --theme-flight: #8C9C84;
+            --theme-day1: #D48C70;
+            --theme-day2: #E2B144;
+            --theme-day3: #8C9C84;
+            --theme-day4: #5D8AA8;
+            --theme-day5: #D988A1;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 10% 20%, rgba(212, 140, 112, 0.05) 0%, transparent 20%), 
+                              radial-gradient(circle at 90% 80%, rgba(140, 156, 132, 0.1) 0%, transparent 20%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            -webkit-tap-highlight-color: transparent; /* 移除手機點擊閃爍 */
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: var(--theme-day1);
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* 水平滑動的置頂導覽列 */
+        .sticky-nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(249, 246, 240, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 15px 20px;
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            scrollbar-width: none; /* Firefox 隱藏捲軸 */
+            -ms-overflow-style: none; /* IE 隱藏捲軸 */
+        }
+        .sticky-nav::-webkit-scrollbar {
+            display: none; /* Chrome 隱藏捲軸 */
+        }
+
+        /* 導覽按鈕 */
+        .nav-btn {
+            white-space: nowrap;
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: none;
+            background: white;
+            color: var(--text-light);
+            font-weight: 700;
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        /* 各天專屬 Active 顏色 */
+        .nav-btn[data-theme="flight"].active { background: var(--theme-flight); color: white; transform: scale(1.05); box-shadow: 0 6px 15px rgba(140, 156, 132, 0.3); }
+        .nav-btn[data-theme="day1"].active { background: var(--theme-day1); color: white; transform: scale(1.05); box-shadow: 0 6px 15px rgba(212, 140, 112, 0.3); }
+        .nav-btn[data-theme="day2"].active { background: var(--theme-day2); color: white; transform: scale(1.05); box-shadow: 0 6px 15px rgba(226, 177, 68, 0.3); }
+        .nav-btn[data-theme="day3"].active { background: var(--theme-day3); color: white; transform: scale(1.05); box-shadow: 0 6px 15px rgba(140, 156, 132, 0.3); }
+        .nav-btn[data-theme="day4"].active { background: var(--theme-day4); color: white; transform: scale(1.05); box-shadow: 0 6px 15px rgba(93, 138, 168, 0.3); }
+        .nav-btn[data-theme="day5"].active { background: var(--theme-day5); color: white; transform: scale(1.05); box-shadow: 0 6px 15px rgba(217, 136, 161, 0.3); }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 70vh;
+        }
+
+        /* 切換視圖容器 */
+        .view-pane {
+            display: none; /* 預設隱藏 */
+            animation: slideUpFade 0.4s ease forwards;
+        }
+        .view-pane.active {
+            display: block; /* 顯示選中的天數 */
+        }
+
+        /* 航班卡片 */
+        .flight-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            border-top: 6px solid var(--theme-flight);
+        }
+        .flight-card h3 { margin-top: 0; color: var(--theme-flight); display: flex; align-items: center; gap: 10px; font-size: 1.3rem; }
+        .flight-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px dashed rgba(0,0,0,0.1); }
+        .flight-row:last-child { border-bottom: none; }
+        .flight-time { font-weight: 700; font-size: 1.2rem; color: var(--text-main); }
+
+        /* 行程卡片 */
+        .day-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        /* 根據天數改變卡片頂部顏色 */
+        #pane-day1 .day-card { border-top: 6px solid var(--theme-day1); }
+        #pane-day2 .day-card { border-top: 6px solid var(--theme-day2); }
+        #pane-day3 .day-card { border-top: 6px solid var(--theme-day3); }
+        #pane-day4 .day-card { border-top: 6px solid var(--theme-day4); }
+        #pane-day5 .day-card { border-top: 6px solid var(--theme-day5); }
+
+        .day-title {
+            font-size: 1.3rem;
+            margin-top: 0;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+            padding-bottom: 15px;
+        }
+
+        /* 根據天數改變標題顏色 */
+        #pane-day1 .day-title { color: var(--theme-day1); }
+        #pane-day2 .day-title { color: var(--theme-day2); }
+        #pane-day3 .day-title { color: var(--theme-day3); }
+        #pane-day4 .day-title { color: var(--theme-day4); }
+        #pane-day5 .day-title { color: var(--theme-day5); }
+
+        .event {
+            display: flex;
+            flex-direction: column; /* 手機版改為垂直排列 */
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            transition: transform 0.2s ease;
+        }
+
+        .event:active {
+            transform: scale(0.98); /* 手機點擊微縮放效果 */
+            background: #fdfdfd;
+        }
+
+        .time {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        /* 根據天數改變時間顏色 */
+        #pane-day1 .time { color: var(--theme-day1); }
+        #pane-day2 .time { color: var(--theme-day2); }
+        #pane-day3 .time { color: var(--theme-day3); }
+        #pane-day4 .time { color: var(--theme-day4); }
+        #pane-day5 .time { color: var(--theme-day5); }
+
+        .details {
+            flex-grow: 1;
+            font-size: 0.95rem;
+        }
+
+        .highlight {
+            color: #d9534f;
+            font-weight: 700;
+            background: rgba(217, 83, 79, 0.1);
+            padding: 2px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        /* 導航按鈕 */
+        .map-btn {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-top: 8px;
+            transition: all 0.2s ease;
+        }
+        .map-btn:hover, .map-btn:active {
+            background: rgba(0, 0, 0, 0.1);
+            color: var(--text-main);
+            transform: translateY(-1px);
+        }
+
+        /* 分享按鈕 (懸浮) */
+        .share-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 20px;
+            background: var(--theme-day1);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(212, 140, 112, 0.4);
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-family: inherit;
+        }
+        .share-btn:hover, .share-btn:active {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(212, 140, 112, 0.6);
+        }
+
+        /* 互動式 Tab (Day 5 專用) */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: rgba(0,0,0,0.03);
+            padding: 5px;
+            border-radius: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            padding: 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: var(--theme-day5);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Keyframes */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* 平板以上尺寸調整回橫向排列 */
+        @media (min-width: 600px) {
+            .event { flex-direction: row; padding: 10px; background: transparent; box-shadow: none; border-radius: 10px; }
+            .event:hover { background: rgba(0,0,0,0.02); transform: translateX(5px); }
+            .time { min-width: 85px; margin-bottom: 0; font-size: 1rem; }
+            h1 { font-size: 2.2rem; }
+            .day-card { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🇯🇵 仙台馬拉松・東北之旅</h1>
+        <div class="subtitle">05/09 (六) ～ 05/13 (三)</div>
+    </header>
+
+    <!-- 頂部浮動選單 (Sticky Nav) -->
+    <nav class="sticky-nav" id="mainNav">
+        <button class="nav-btn active" data-theme="flight" onclick="switchMainTab('pane-flight', this)">✈️ 航班</button>
+        <button class="nav-btn" data-theme="day1" onclick="switchMainTab('pane-day1', this)">D1 抵達</button>
+        <button class="nav-btn" data-theme="day2" onclick="switchMainTab('pane-day2', this)">D2 賽事</button>
+        <button class="nav-btn" data-theme="day3" onclick="switchMainTab('pane-day3', this)">D3 山形</button>
+        <button class="nav-btn" data-theme="day4" onclick="switchMainTab('pane-day4', this)">D4 松島</button>
+        <button class="nav-btn" data-theme="day5" onclick="switchMainTab('pane-day5', this)">D5 回程</button>
+    </nav>
+
+    <div class="container">
+        
+        <!-- ==================== 航班資訊 ==================== -->
+        <div id="pane-flight" class="view-pane active">
+            <div class="flight-card">
+                <h3>✈️ 航班資訊</h3>
+                <div class="flight-row">
+                    <div>
+                        <span style="font-size: 0.85em; color: #888;">【去程】 05/09 (六) BR118</span><br>
+                        <strong>台北 (TPE)</strong> ➔ <strong>仙台 (SDJ)</strong>
+                    </div>
+                    <div class="flight-time">10:05 - 14:35</div>
+                </div>
+                <div class="flight-row">
+                    <div>
+                        <span style="font-size: 0.85em; color: #888;">【回程】 05/13 (三) BR117</span><br>
+                        <strong>仙台 (SDJ)</strong> ➔ <strong>台北 (TPE)</strong>
+                    </div>
+                    <div class="flight-time">16:05 - 18:55</div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; color: var(--text-light); font-size: 0.9rem; padding: 20px;">
+                👆 請滑動上方選單切換每日行程
+            </div>
+        </div>
+
+        <!-- ==================== Day 1 ==================== -->
+        <div id="pane-day1" class="view-pane">
+            <div class="day-card">
+                <h2 class="day-title">🏃 Day 1 | 抵達與報到</h2>
+                <div class="event">
+                    <div class="time">14:35</div>
+                    <div class="details">
+                        抵達仙台機場，辦理入境手續。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=仙台機場" target="_blank" class="map-btn">📍 導航至 仙台機場</a>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="time">15:20</div>
+                    <div class="details">
+                        搭乘「仙台機場聯絡線」前往仙台車站。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=仙台車站" target="_blank" class="map-btn">📍 導航至 仙台車站</a>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="time">15:50</div>
+                    <div class="details">
+                        <strong>關鍵任務：寄放行李與領 Bib</strong><br>
+                        • 將大件行李寄放在仙台車站。<br>
+                        • 轉乘仙石線前往「宮城野原站」（①出口步行 5 分鐘）。<br>
+                        <span class="highlight">務必於 17:00 前</span><br>抵達弘進ゴム アスリートパーク仙台領取。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=弘進ゴム+アスリートパーク仙台" target="_blank" class="map-btn">📍 導航至 賽事會場</a>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="time">17:30</div>
+                    <div class="details">
+                        飯店 Check-in：<br>Richmond Hotel Premier Sendai Ekimae。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Richmond+Hotel+Premier+Sendai+Ekimae" target="_blank" class="map-btn">📍 導航至 飯店</a>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="time">18:15</div>
+                    <div class="details">
+                        購買裝備：Step Sports Sendai（步行約 12 分鐘）。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Step+Sports+Sendai" target="_blank" class="map-btn">📍 導航至 體育用品店</a>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="time">19:00</div>
+                    <div class="details">
+                        <strong>晚餐：</strong>藏之庄 圍爐燒（預約 12 位）。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=藏之庄+總本店+仙台" target="_blank" class="map-btn">📍 導航至 藏之庄</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Day 2 ==================== -->
+        <div id="pane-day2" class="view-pane">
+            <div class="day-card">
+                <h2 class="day-title">🏅 Day 2 | Race Day</h2>
+                <div class="event">
+                    <div class="time">08:16</div>
+                    <div class="details">
+                        抵達賽場：<br>弘進ゴム アスリートパーク仙台。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=弘進ゴム+アスリートパーク仙台" target="_blank" class="map-btn">📍 導航至 賽事會場</a>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="time">午後</div>
+                    <div class="details">
+                        完賽回飯店盥洗、充分休息。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Richmond+Hotel+Premier+Sendai+Ekimae" target="_blank" class="map-btn">📍 導航至 飯店</a>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="time">下午</div>
+                    <div class="details">自由活動（建議在市區散步或到百貨公司吹冷氣，緩解肌肉痠痛）。</div>
+                </div>
+                <div class="event">
+                    <div class="time">18:00</div>
+                    <div class="details">
+                        <strong>慶功宴：</strong>壽喜燒 KATO（預約 10 位）。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=すき焼+かとう+仙台" target="_blank" class="map-btn">📍 導航至 壽喜燒 KATO</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Day 3 ==================== -->
+        <div id="pane-day3" class="view-pane">
+            <div class="day-card">
+                <h2 class="day-title">⛰️ Day 3 | 山形絕景一日遊</h2>
+                <div class="event">
+                    <div class="time">07:30</div>
+                    <div class="details">飯店集合出發。</div>
+                </div>
+                <div class="event">
+                    <div class="time">09:40</div>
+                    <div class="details">
+                        <strong>立石寺 (山寺)：</strong>挑戰階梯俯瞰絕景。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=山寺+立石寺" target="_blank" class="map-btn">📍 導航至 立石寺</a>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="time">12:00</div>
+                    <div class="details">
+                        <strong>天童溫泉：</strong>午餐與足湯體驗。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=天童溫泉" target="_blank" class="map-btn">📍 導航至 天童溫泉</a>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="time">13:40</div>
+                    <div class="details">
+                        <strong>銀山溫泉：</strong>大正浪漫街道散策。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=銀山溫泉" target="_blank" class="map-btn">📍 導航至 銀山溫泉</a>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="time">15:40</div>
+                    <div class="details">離開銀山溫泉返回仙台。</div>
+                </div>
+                <div class="event">
+                    <div class="time">18:30</div>
+                    <div class="details">
+                        <strong>晚餐：</strong>牛舌 善治郎（需現場抽號碼牌）。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=牛たん+善治郎+仙台駅前本店" target="_blank" class="map-btn">📍 導航至 牛舌 善治郎</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Day 4 ==================== -->
+        <div id="pane-day4" class="view-pane">
+            <div class="day-card">
+                <h2 class="day-title">🌊 Day 4 | 松島海岸一日遊</h2>
+                <div class="event">
+                    <div class="time">08:50</div>
+                    <div class="details">
+                        JR 仙台車站集合。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=仙台車站" target="_blank" class="map-btn">📍 導航至 仙台車站</a>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="time">09:45</div>
+                    <div class="details">
+                        抵達松島海岸站。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=松島海岸駅" target="_blank" class="map-btn">📍 導航至 松島海岸站</a>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="time">10:00</div>
+                    <div class="details">
+                        <strong>松島灣觀光船：</strong>（需提前於 KKDay 換票）。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=松島島巡り観光船" target="_blank" class="map-btn">📍 導航至 觀光船乘船處</a>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="time">11:30</div>
+                    <div class="details">
+                        <strong>午餐：</strong>漁師海鮮丼 或 松島魚市場。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=松島さかな市場" target="_blank" class="map-btn">📍 導航至 松島魚市場</a>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="time">12:45</div>
+                    <div class="details">
+                        <strong>體驗：</strong>手烤魚板 或 牡蠣麵包。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=松島蒲鉾本舗+総本店" target="_blank" class="map-btn">📍 導航至 烤魚板體驗</a>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="time">14:00</div>
+                    <div class="details">
+                        參訪瑞嚴寺、圓通院、福浦島（紅橋）。<br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=瑞巌寺" target="_blank" class="map-btn">📍 導航至 瑞嚴寺</a>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="time">16:44</div>
+                    <div class="details">搭乘 JR 返回仙台。</div>
+                </div>
+                <div class="event">
+                    <div class="time">18:00</div>
+                    <div class="details"><strong>晚餐：</strong>市區自由覓食或安排燒肉。</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Day 5 ==================== -->
+        <div id="pane-day5" class="view-pane">
+            <div class="day-card">
+                <h2 class="day-title">🛍️ Day 5 | 仙台最後衝刺</h2>
+                
+                <!-- Day 5 內部的子選單 -->
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchDay5Tab('planA', this)">⛩️ 方案 A (文化)</button>
+                    <button class="tab-btn" onclick="switchDay5Tab('planB', this)">🛒 方案 B (購物)</button>
+                </div>
+
+                <!-- 方案 A -->
+                <div id="planA" class="tab-content active">
+                    <div class="event">
+                        <div class="time">09:00</div>
+                        <div class="details">
+                            搭乘 <strong>Loople Sendai 觀光巴士</strong> 參觀仙台城跡。<br>
+                            <a href="https://www.google.com/maps/search/?api=1&query=仙台城跡" target="_blank" class="map-btn">📍 導航至 仙台城跡</a>
+                        </div>
+                    </div>
+                    <div class="event">
+                        <div class="time">11:30</div>
+                        <div class="details">
+                            <strong>最後午餐：</strong>牛舌 閣。<br>
+                            <a href="https://www.google.com/maps/search/?api=1&query=牛たん料理+閣+ブランドーム本店" target="_blank" class="map-btn">📍 導航至 牛舌 閣</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 方案 B -->
+                <div id="planB" class="tab-content">
+                    <div class="event">
+                        <div class="time">09:00</div>
+                        <div class="details">
+                            飯店辦理退房，帶著行李前往機場旁的 <strong>Aeon Mall 名取</strong>。<br>
+                            <a href="https://www.google.com/maps/search/?api=1&query=イオンモール名取" target="_blank" class="map-btn">📍 導航至 Aeon Mall 名取</a>
+                        </div>
+                    </div>
+                    <div class="event">
+                        <div class="time">11:30</div>
+                        <div class="details"><strong>最後午餐：</strong>Aeon Mall 內餐廳。</div>
+                    </div>
+                </div>
+
+                <!-- 共通行程 -->
+                <div style="border-top: 2px dashed rgba(0,0,0,0.1); margin-top: 20px; padding-top: 20px;">
+                    <div class="event">
+                        <div class="time">14:00</div>
+                        <div class="details">
+                            全員抵達仙台機場（SDJ）辦理登機手續。<br>
+                            <a href="https://www.google.com/maps/search/?api=1&query=仙台機場" target="_blank" class="map-btn">📍 導航至 仙台機場</a>
+                        </div>
+                    </div>
+                    <div class="event" style="background: rgba(217, 136, 161, 0.1);">
+                        <div class="time">16:05</div>
+                        <div class="details"><strong>✈️ 起飛返回台北，旅途平安。</strong></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 懸浮分享按鈕 -->
+    <button class="share-btn" onclick="shareItinerary()">
+        🔗 分享行程
+    </button>
+
+    <script>
+        // 分享功能邏輯
+        function shareItinerary() {
+            if (navigator.share) {
+                // 手機版：呼叫系統內建的分享選單 (可直接傳到 LINE、IG 等)
+                navigator.share({
+                    title: '🇯🇵 2026 仙台馬拉松・東北之旅',
+                    text: '快來看看我們這次的仙台馬拉松 5天4夜 行程攻略！',
+                    url: window.location.href
+                }).catch(console.error);
+            } else {
+                // 電腦版或不支援的瀏覽器：複製網址
+                const dummy = document.createElement('input');
+                const text = window.location.href;
+                document.body.appendChild(dummy);
+                dummy.value = text;
+                dummy.select();
+                document.execCommand('copy');
+                document.body.removeChild(dummy);
+                alert('🔗 網址已複製！您可以直接貼上給朋友囉～\n(註：若是直接傳送檔案，請將此網頁存檔成 .html 傳給朋友)');
+            }
+        }
+
+        // 主選單切換邏輯
+        function switchMainTab(paneId, btnElement) {
+            // 1. 隱藏所有面板
+            document.querySelectorAll('.view-pane').forEach(pane => {
+                pane.classList.remove('active');
+            });
+            // 2. 移除所有按鈕的 active 狀態
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 3. 顯示目標面板並加上 active 狀態
+            document.getElementById(paneId).classList.add('active');
+            btnElement.classList.add('active');
+
+            // 4. 自動將點擊的按鈕置中 (提升手機體驗)
+            btnElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+
+            // 5. 滾動回頂部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Day 5 的方案 A/B 切換邏輯 (與主選單獨立)
+        function switchDay5Tab(tabId, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(tabId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+    </script>
+</body>
+</html>
