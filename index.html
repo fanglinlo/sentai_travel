@@ -123,6 +123,17 @@
             border-top: 6px solid var(--theme-flight);
         }
         .flight-card h3 { margin-top: 0; color: var(--theme-flight); display: flex; align-items: center; gap: 10px; font-size: 1.3rem; }
+        .flight-group + .flight-group {
+            margin-top: 22px;
+            padding-top: 22px;
+            border-top: 4px solid rgba(140, 156, 132, 0.35);
+        }
+        .flight-group-title {
+            margin: 0 0 8px;
+            font-size: 1rem;
+            color: var(--theme-flight);
+            letter-spacing: 0.04em;
+        }
         .flight-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px dashed rgba(0,0,0,0.1); }
         .flight-row:last-child { border-bottom: none; }
         .flight-time { font-weight: 700; font-size: 1.2rem; color: var(--text-main); }
@@ -225,32 +236,6 @@
             transform: translateY(-1px);
         }
 
-        /* 分享按鈕 (懸浮) */
-        .share-btn {
-            position: fixed;
-            bottom: 25px;
-            right: 20px;
-            background: var(--theme-day1);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 12px 20px;
-            font-size: 1rem;
-            font-weight: 700;
-            box-shadow: 0 4px 15px rgba(212, 140, 112, 0.4);
-            cursor: pointer;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            font-family: inherit;
-        }
-        .share-btn:hover, .share-btn:active {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(212, 140, 112, 0.6);
-        }
-
         /* 互動式 Tab (Day 5 專用) */
         .tabs {
             display: flex;
@@ -288,6 +273,84 @@
             display: block;
         }
 
+        .weather-card {
+            background: linear-gradient(135deg, rgba(93, 138, 168, 0.14), rgba(255, 255, 255, 0.96));
+            border-radius: 24px;
+            padding: 28px 22px;
+            margin: 10px 0 90px;
+            box-shadow: 0 14px 35px rgba(93, 138, 168, 0.08);
+            border: 1px solid rgba(93, 138, 168, 0.12);
+        }
+
+        .weather-header {
+            margin-bottom: 18px;
+        }
+
+        .weather-title {
+            margin: 0 0 6px;
+            font-size: 1.3rem;
+            color: var(--theme-day4);
+        }
+
+        .weather-subtitle {
+            color: var(--text-light);
+            font-size: 0.94rem;
+        }
+
+        .weather-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .weather-grid.single {
+            grid-template-columns: 1fr;
+        }
+
+        .weather-item {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.03);
+        }
+
+        .weather-item.hidden {
+            display: none;
+        }
+
+        .weather-item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .weather-day {
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .weather-icon {
+            font-size: 1.3rem;
+        }
+
+        .weather-temp {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--theme-day4);
+            margin-bottom: 6px;
+        }
+
+        .weather-desc,
+        .weather-tip {
+            font-size: 0.93rem;
+        }
+
+        .weather-tip {
+            color: var(--text-light);
+            margin-top: 6px;
+        }
+
         /* Keyframes */
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-15px); }
@@ -309,6 +372,7 @@
             .time { min-width: 85px; margin-bottom: 0; font-size: 1rem; }
             h1 { font-size: 2.2rem; }
             .day-card { padding: 30px; }
+            .weather-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
     </style>
 </head>
@@ -322,11 +386,11 @@
     <!-- 頂部浮動選單 (Sticky Nav) -->
     <nav class="sticky-nav" id="mainNav">
         <button class="nav-btn active" data-theme="flight" onclick="switchMainTab('pane-flight', this)">✈️ 航班</button>
-        <button class="nav-btn" data-theme="day1" onclick="switchMainTab('pane-day1', this)">D1 抵達</button>
-        <button class="nav-btn" data-theme="day2" onclick="switchMainTab('pane-day2', this)">D2 賽事</button>
-        <button class="nav-btn" data-theme="day3" onclick="switchMainTab('pane-day3', this)">D3 山形</button>
-        <button class="nav-btn" data-theme="day4" onclick="switchMainTab('pane-day4', this)">D4 松島</button>
-        <button class="nav-btn" data-theme="day5" onclick="switchMainTab('pane-day5', this)">D5 回程</button>
+        <button class="nav-btn" data-theme="day1" onclick="switchMainTab('pane-day1', this)">5/9 D1 抵達</button>
+        <button class="nav-btn" data-theme="day2" onclick="switchMainTab('pane-day2', this)">5/10 D2 賽事</button>
+        <button class="nav-btn" data-theme="day3" onclick="switchMainTab('pane-day3', this)">5/11 D3 山形</button>
+        <button class="nav-btn" data-theme="day4" onclick="switchMainTab('pane-day4', this)">5/12 D4 松島</button>
+        <button class="nav-btn" data-theme="day5" onclick="switchMainTab('pane-day5', this)">5/13 D5 回程</button>
     </nav>
 
     <div class="container">
@@ -335,19 +399,39 @@
         <div id="pane-flight" class="view-pane active">
             <div class="flight-card">
                 <h3>✈️ 航班資訊</h3>
-                <div class="flight-row">
-                    <div>
-                        <span style="font-size: 0.85em; color: #888;">【去程】 05/09 (六) BR118</span><br>
-                        <strong>台北 (TPE)</strong> ➔ <strong>仙台 (SDJ)</strong>
+                <div class="flight-group">
+                    <h4 class="flight-group-title">長榮航班</h4>
+                    <div class="flight-row">
+                        <div>
+                            <span style="font-size: 0.85em; color: #888;">【去程】 05/09 (六) BR118</span><br>
+                            <strong>台北 (TPE)</strong> ➔ <strong>仙台 (SDJ)</strong>
+                        </div>
+                        <div class="flight-time">10:05 - 14:35</div>
                     </div>
-                    <div class="flight-time">10:05 - 14:35</div>
+                    <div class="flight-row">
+                        <div>
+                            <span style="font-size: 0.85em; color: #888;">【回程】 05/13 (三) BR117</span><br>
+                            <strong>仙台 (SDJ)</strong> ➔ <strong>台北 (TPE)</strong>
+                        </div>
+                        <div class="flight-time">16:05 - 18:55</div>
+                    </div>
                 </div>
-                <div class="flight-row">
-                    <div>
-                        <span style="font-size: 0.85em; color: #888;">【回程】 05/13 (三) BR117</span><br>
-                        <strong>仙台 (SDJ)</strong> ➔ <strong>台北 (TPE)</strong>
+                <div class="flight-group">
+                    <h4 class="flight-group-title">星宇航班</h4>
+                    <div class="flight-row">
+                        <div>
+                            <span style="font-size: 0.85em; color: #888;">【去程】 05/09 (六) SJX862</span><br>
+                            <strong>台北 (TPE)</strong> ➔ <strong>仙台 (SDJ)</strong>
+                        </div>
+                        <div class="flight-time">11:35 - 16:00</div>
                     </div>
-                    <div class="flight-time">16:05 - 18:55</div>
+                    <div class="flight-row">
+                        <div>
+                            <span style="font-size: 0.85em; color: #888;">【回程】 05/13 (三) SJX863</span><br>
+                            <strong>仙台 (SDJ)</strong> ➔ <strong>台北 (TPE)</strong>
+                        </div>
+                        <div class="flight-time">17:20 - 20:10</div>
+                    </div>
                 </div>
             </div>
             
@@ -602,37 +686,88 @@
             </div>
         </div>
 
+        <section class="weather-card">
+            <div class="weather-header">
+                <h2 class="weather-title">🌤️ 天氣預報參考</h2>
+                <div class="weather-subtitle" id="weatherSubtitle">切換上方日期時，這裡會同步顯示當天的天氣提醒。</div>
+            </div>
+
+            <div class="weather-grid single">
+                <div class="weather-item" data-weather-pane="pane-day1">
+                    <div class="weather-item-top">
+                        <div class="weather-day">5/9 Day 1 | 仙台抵達</div>
+                        <div class="weather-icon">☀️</div>
+                    </div>
+                    <div class="weather-temp">14°C - 22°C</div>
+                    <div class="weather-desc">白天溫和舒適，早晚微涼，移動時體感會比較明顯。</div>
+                    <div class="weather-tip">建議：短袖加薄外套，晚上用餐可帶一件防風層。</div>
+                </div>
+
+                <div class="weather-item hidden" data-weather-pane="pane-day2">
+                    <div class="weather-item-top">
+                        <div class="weather-day">5/10 Day 2 | 賽事日</div>
+                        <div class="weather-icon">☀️</div>
+                    </div>
+                    <div class="weather-temp">13°C - 21°C</div>
+                    <div class="weather-desc">清晨偏涼，跑步時體感算理想，中午後逐漸回溫。</div>
+                    <div class="weather-tip">建議：比賽前後準備輕薄披風，並記得補水。</div>
+                </div>
+
+                <div class="weather-item hidden" data-weather-pane="pane-day3">
+                    <div class="weather-item-top">
+                        <div class="weather-day">5/11 Day 3 | 山形一日遊</div>
+                        <div class="weather-icon">⛅</div>
+                    </div>
+                    <div class="weather-temp">11°C - 20°C</div>
+                    <div class="weather-desc">山區日夜溫差較大，體感比仙台再涼一些，偶有短暫陣雨。</div>
+                    <div class="weather-tip">建議：穿好走階梯的防滑鞋，隨身帶折疊傘最安心。</div>
+                </div>
+
+                <div class="weather-item hidden" data-weather-pane="pane-day4">
+                    <div class="weather-item-top">
+                        <div class="weather-day">5/12 Day 4 | 松島海岸</div>
+                        <div class="weather-icon">🌥️</div>
+                    </div>
+                    <div class="weather-temp">13°C - 19°C</div>
+                    <div class="weather-desc">海邊風感較強，搭船時體感會再下一階。</div>
+                    <div class="weather-tip">建議：帽子、薄防風外套很實用，拍照也比較舒服。</div>
+                </div>
+
+                <div class="weather-item hidden" data-weather-pane="pane-day5">
+                    <div class="weather-item-top">
+                        <div class="weather-day">5/13 Day 5 | 回程日</div>
+                        <div class="weather-icon">☀️</div>
+                    </div>
+                    <div class="weather-temp">15°C - 23°C</div>
+                    <div class="weather-desc">市區活動大致舒適，白天偏暖，機場移動仍建議洋蔥式穿法。</div>
+                    <div class="weather-tip">建議：好脫好穿的薄層最方便，搭機前不容易過熱。</div>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <!-- 懸浮分享按鈕 -->
-    <button class="share-btn" onclick="shareItinerary()">
-        🔗 分享行程
-    </button>
-
     <script>
-        // 分享功能邏輯
-        function shareItinerary() {
-            if (navigator.share) {
-                // 手機版：呼叫系統內建的分享選單 (可直接傳到 LINE、IG 等)
-                navigator.share({
-                    title: '🇯🇵 2026 仙台馬拉松・東北之旅',
-                    text: '快來看看我們這次的仙台馬拉松 5天4夜 行程攻略！',
-                    url: window.location.href
-                }).catch(console.error);
-            } else {
-                // 電腦版或不支援的瀏覽器：複製網址
-                const dummy = document.createElement('input');
-                const text = window.location.href;
-                document.body.appendChild(dummy);
-                dummy.value = text;
-                dummy.select();
-                document.execCommand('copy');
-                document.body.removeChild(dummy);
-                alert('🔗 網址已複製！您可以直接貼上給朋友囉～\n(註：若是直接傳送檔案，請將此網頁存檔成 .html 傳給朋友)');
+        function syncWeather(paneId) {
+            const weatherCard = document.querySelector('.weather-card');
+            const subtitle = document.getElementById('weatherSubtitle');
+            const weatherItems = document.querySelectorAll('.weather-item[data-weather-pane]');
+
+            if (paneId === 'pane-flight') {
+                weatherCard.style.display = 'none';
+                return;
             }
+
+            weatherCard.style.display = 'block';
+            if (subtitle) {
+                subtitle.textContent = '已同步顯示目前日期的天氣預報與穿搭提醒。';
+            }
+
+            weatherItems.forEach(item => {
+                const isActive = item.dataset.weatherPane === paneId;
+                item.classList.toggle('hidden', !isActive);
+            });
         }
 
-        // 主選單切換邏輯
         function switchMainTab(paneId, btnElement) {
             // 1. 隱藏所有面板
             document.querySelectorAll('.view-pane').forEach(pane => {
@@ -650,7 +785,10 @@
             // 4. 自動將點擊的按鈕置中 (提升手機體驗)
             btnElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 
-            // 5. 滾動回頂部
+            // 5. 同步底部天氣卡片
+            syncWeather(paneId);
+
+            // 6. 滾動回頂部
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -666,6 +804,8 @@
             document.getElementById(tabId).classList.add('active');
             btnElement.classList.add('active');
         }
+
+        syncWeather('pane-flight');
     </script>
 </body>
 </html>
