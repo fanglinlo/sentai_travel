@@ -297,24 +297,11 @@
             font-size: 0.94rem;
         }
 
-        .weather-grid {
-            display: grid;
-            gap: 14px;
-        }
-
-        .weather-grid.single {
-            grid-template-columns: 1fr;
-        }
-
         .weather-item {
             background: rgba(255, 255, 255, 0.92);
             border-radius: 18px;
             padding: 16px;
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.03);
-        }
-
-        .weather-item.hidden {
-            display: none;
         }
 
         .weather-item-top {
@@ -351,6 +338,72 @@
             margin-top: 6px;
         }
 
+        .weather-hours {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .weather-hour {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 14px;
+            padding: 12px 10px;
+            text-align: center;
+            box-shadow: inset 0 0 0 1px rgba(93, 138, 168, 0.08);
+        }
+
+        .weather-hour-time {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
+        .weather-hour-icon {
+            font-size: 1.1rem;
+            margin: 6px 0;
+        }
+
+        .weather-hour-temp {
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .weather-hour-rain {
+            margin-top: 4px;
+            font-size: 0.85rem;
+            color: var(--theme-day4);
+        }
+
+        .weather-status {
+            margin-top: 16px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .weather-fallback {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px dashed rgba(0, 0, 0, 0.1);
+        }
+
+        .weather-link {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: rgba(93, 138, 168, 0.1);
+            color: var(--theme-day4);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .weather-link:hover,
+        .weather-link:active {
+            background: rgba(93, 138, 168, 0.16);
+        }
+
         /* Keyframes */
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-15px); }
@@ -372,7 +425,7 @@
             .time { min-width: 85px; margin-bottom: 0; font-size: 1rem; }
             h1 { font-size: 2.2rem; }
             .day-card { padding: 30px; }
-            .weather-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .weather-hours { grid-template-columns: repeat(6, minmax(0, 1fr)); }
         }
     </style>
 </head>
@@ -689,83 +742,230 @@
         <section class="weather-card">
             <div class="weather-header">
                 <h2 class="weather-title">🌤️ 天氣預報參考</h2>
-                <div class="weather-subtitle" id="weatherSubtitle">切換上方日期時，這裡會同步顯示當天的天氣提醒。</div>
+                <div class="weather-subtitle" id="weatherSubtitle">切換上方日期時，這裡會抓取當日逐小時預報；若暫時無資料，會改顯示日本氣象局連結。</div>
             </div>
 
-            <div class="weather-grid single">
-                <div class="weather-item" data-weather-pane="pane-day1">
-                    <div class="weather-item-top">
-                        <div class="weather-day">5/9 Day 1 | 仙台抵達</div>
-                        <div class="weather-icon">☀️</div>
-                    </div>
-                    <div class="weather-temp">14°C - 22°C</div>
-                    <div class="weather-desc">白天溫和舒適，早晚微涼，移動時體感會比較明顯。</div>
-                    <div class="weather-tip">建議：短袖加薄外套，晚上用餐可帶一件防風層。</div>
+            <div class="weather-item" id="weatherItem">
+                <div class="weather-item-top">
+                    <div class="weather-day" id="weatherDay">5/9 Day 1 | 仙台抵達</div>
+                    <div class="weather-icon" id="weatherIcon">🌤️</div>
                 </div>
-
-                <div class="weather-item hidden" data-weather-pane="pane-day2">
-                    <div class="weather-item-top">
-                        <div class="weather-day">5/10 Day 2 | 賽事日</div>
-                        <div class="weather-icon">☀️</div>
-                    </div>
-                    <div class="weather-temp">13°C - 21°C</div>
-                    <div class="weather-desc">清晨偏涼，跑步時體感算理想，中午後逐漸回溫。</div>
-                    <div class="weather-tip">建議：比賽前後準備輕薄披風，並記得補水。</div>
-                </div>
-
-                <div class="weather-item hidden" data-weather-pane="pane-day3">
-                    <div class="weather-item-top">
-                        <div class="weather-day">5/11 Day 3 | 山形一日遊</div>
-                        <div class="weather-icon">⛅</div>
-                    </div>
-                    <div class="weather-temp">11°C - 20°C</div>
-                    <div class="weather-desc">山區日夜溫差較大，體感比仙台再涼一些，偶有短暫陣雨。</div>
-                    <div class="weather-tip">建議：穿好走階梯的防滑鞋，隨身帶折疊傘最安心。</div>
-                </div>
-
-                <div class="weather-item hidden" data-weather-pane="pane-day4">
-                    <div class="weather-item-top">
-                        <div class="weather-day">5/12 Day 4 | 松島海岸</div>
-                        <div class="weather-icon">🌥️</div>
-                    </div>
-                    <div class="weather-temp">13°C - 19°C</div>
-                    <div class="weather-desc">海邊風感較強，搭船時體感會再下一階。</div>
-                    <div class="weather-tip">建議：帽子、薄防風外套很實用，拍照也比較舒服。</div>
-                </div>
-
-                <div class="weather-item hidden" data-weather-pane="pane-day5">
-                    <div class="weather-item-top">
-                        <div class="weather-day">5/13 Day 5 | 回程日</div>
-                        <div class="weather-icon">☀️</div>
-                    </div>
-                    <div class="weather-temp">15°C - 23°C</div>
-                    <div class="weather-desc">市區活動大致舒適，白天偏暖，機場移動仍建議洋蔥式穿法。</div>
-                    <div class="weather-tip">建議：好脫好穿的薄層最方便，搭機前不容易過熱。</div>
+                <div class="weather-temp" id="weatherTemp">切換日期後載入 Open-Meteo JMA 預報</div>
+                <div class="weather-desc" id="weatherDesc">顯示當日 06:00、09:00、12:00、15:00、18:00、21:00 的溫度與降水機率。</div>
+                <div class="weather-tip" id="weatherTip">首次切換到該日期時才會抓取，之後會直接使用快取。</div>
+                <div class="weather-hours" id="weatherHours"></div>
+                <div class="weather-status" id="weatherStatus"></div>
+                <div class="weather-fallback" id="weatherFallback" hidden>
+                    <div id="weatherFallbackText">目前還沒有可用的逐小時預報。</div>
+                    <a id="weatherFallbackLink" class="weather-link" href="#" target="_blank" rel="noopener noreferrer">查看日本氣象局</a>
                 </div>
             </div>
         </section>
     </div>
 
     <script>
-        function syncWeather(paneId) {
+        const WEATHER_HOURS = ['06:00', '09:00', '12:00', '15:00', '18:00', '21:00'];
+        const WEATHER_CONFIG = {
+            'pane-day1': {
+                label: '5/9 Day 1 | 仙台抵達',
+                city: '仙台',
+                date: '2026-05-09',
+                latitude: 38.2682,
+                longitude: 140.8694,
+                jmaUrl: 'https://www.data.jma.go.jp/yoho/data/jishin/met/kishoushien_Miyagi_Sendai-shi%20Tobu.html'
+            },
+            'pane-day2': {
+                label: '5/10 Day 2 | 賽事日',
+                city: '仙台',
+                date: '2026-05-10',
+                latitude: 38.2682,
+                longitude: 140.8694,
+                jmaUrl: 'https://www.data.jma.go.jp/yoho/data/jishin/met/kishoushien_Miyagi_Sendai-shi%20Tobu.html'
+            },
+            'pane-day3': {
+                label: '5/11 Day 3 | 山形一日遊',
+                city: '山形',
+                date: '2026-05-11',
+                latitude: 38.2554,
+                longitude: 140.3396,
+                jmaUrl: 'https://www.data.jma.go.jp/yamagata/'
+            },
+            'pane-day4': {
+                label: '5/12 Day 4 | 松島海岸',
+                city: '松島',
+                date: '2026-05-12',
+                latitude: 38.3736,
+                longitude: 141.0610,
+                jmaUrl: 'https://www.data.jma.go.jp/yoho/data/jishin/met/kishoushien_Miyagi_Matsushima-machi.html'
+            },
+            'pane-day5': {
+                label: '5/13 Day 5 | 回程日',
+                city: '仙台',
+                date: '2026-05-13',
+                latitude: 38.2682,
+                longitude: 140.8694,
+                jmaUrl: 'https://www.data.jma.go.jp/yoho/data/jishin/met/kishoushien_Miyagi_Sendai-shi%20Tobu.html'
+            }
+        };
+        const weatherCache = {};
+        const weatherPending = {};
+        let activeWeatherPane = 'pane-flight';
+
+        function getWeatherIcon(code) {
+            if (code === 0) return '☀️';
+            if ([1, 2].includes(code)) return '🌤️';
+            if (code === 3) return '☁️';
+            if ([45, 48].includes(code)) return '🌫️';
+            if ([51, 53, 55, 56, 57].includes(code)) return '🌦️';
+            if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return '🌧️';
+            if ([71, 73, 75, 77, 85, 86].includes(code)) return '🌨️';
+            if ([95, 96, 99].includes(code)) return '⛈️';
+            return '🌤️';
+        }
+
+        function setWeatherLoading(config) {
+            document.getElementById('weatherDay').textContent = config.label;
+            document.getElementById('weatherIcon').textContent = '⏳';
+            document.getElementById('weatherTemp').textContent = `${config.city}｜讀取逐小時預報中`;
+            document.getElementById('weatherDesc').textContent = '正在向 Open-Meteo 讀取 JMA 模型資料。';
+            document.getElementById('weatherTip').textContent = '若目前還不在可預報時段，系統會自動改顯示日本氣象局連結。';
+            document.getElementById('weatherHours').innerHTML = '';
+            document.getElementById('weatherStatus').textContent = '載入中...';
+            document.getElementById('weatherFallback').hidden = true;
+        }
+
+        function renderWeatherSuccess(config, result) {
+            document.getElementById('weatherDay').textContent = config.label;
+            document.getElementById('weatherIcon').textContent = result.hours[0]?.icon || '🌤️';
+            document.getElementById('weatherTemp').textContent = `${config.city}｜Open-Meteo JMA 每小時預報`;
+            document.getElementById('weatherDesc').textContent = `顯示 ${result.hours.map(item => item.time).join(' / ')} 的溫度與降水機率。`;
+            document.getElementById('weatherTip').textContent = '資料已快取，再次切回這一天不會重複抓取。';
+            document.getElementById('weatherHours').innerHTML = result.hours.map(item => `
+                <div class="weather-hour">
+                    <div class="weather-hour-time">${item.time}</div>
+                    <div class="weather-hour-icon">${item.icon}</div>
+                    <div class="weather-hour-temp">${item.temp}</div>
+                    <div class="weather-hour-rain">降水 ${item.pop}</div>
+                </div>
+            `).join('');
+            document.getElementById('weatherStatus').textContent = `資料來源：Open-Meteo Forecast API（JMA Seamless model）`;
+            document.getElementById('weatherFallback').hidden = true;
+        }
+
+        function renderWeatherFallback(config, message) {
+            document.getElementById('weatherDay').textContent = config.label;
+            document.getElementById('weatherIcon').textContent = '🔗';
+            document.getElementById('weatherTemp').textContent = `${config.city}｜目前無法取得當日逐小時預報`;
+            document.getElementById('weatherDesc').textContent = message;
+            document.getElementById('weatherTip').textContent = '你仍可以改看日本氣象局頁面確認當地最新資訊。';
+            document.getElementById('weatherHours').innerHTML = '';
+            document.getElementById('weatherStatus').textContent = '已切換為官方備援連結。';
+            document.getElementById('weatherFallbackText').textContent = `${config.city} 的 Open-Meteo JMA 逐小時資料目前不可用。`;
+            document.getElementById('weatherFallbackLink').href = config.jmaUrl;
+            document.getElementById('weatherFallbackLink').textContent = `查看日本氣象局 ${config.city} 頁面`;
+            document.getElementById('weatherFallback').hidden = false;
+        }
+
+        async function fetchWeather(config) {
+            const url = new URL('https://api.open-meteo.com/v1/forecast');
+            url.searchParams.set('latitude', config.latitude);
+            url.searchParams.set('longitude', config.longitude);
+            url.searchParams.set('hourly', 'temperature_2m,precipitation_probability,weather_code');
+            url.searchParams.set('models', 'jma_seamless');
+            url.searchParams.set('forecast_days', '16');
+            url.searchParams.set('timezone', 'Asia/Tokyo');
+
+            const response = await fetch(url.toString());
+            if (!response.ok) {
+                throw new Error(`API ${response.status}`);
+            }
+
+            const data = await response.json();
+            const hourly = data && data.hourly;
+            if (!hourly || !hourly.time || !hourly.temperature_2m || !hourly.weather_code) {
+                throw new Error('missing hourly fields');
+            }
+
+            const hourMap = {};
+            hourly.time.forEach((time, index) => {
+                if (!time.startsWith(`${config.date}T`)) {
+                    return;
+                }
+
+                const hour = time.slice(11, 16);
+                hourMap[hour] = {
+                    time: hour,
+                    icon: getWeatherIcon(hourly.weather_code[index]),
+                    temp: `${Math.round(hourly.temperature_2m[index])}°C`,
+                    pop: hourly.precipitation_probability && hourly.precipitation_probability[index] != null
+                        ? `${Math.round(hourly.precipitation_probability[index])}%`
+                        : '—'
+                };
+            });
+
+            const hours = WEATHER_HOURS.map(hour => hourMap[hour]).filter(Boolean);
+            if (!hours.length) {
+                throw new Error('target date unavailable');
+            }
+
+            return { hours };
+        }
+
+        async function syncWeather(paneId) {
+            activeWeatherPane = paneId;
+
             const weatherCard = document.querySelector('.weather-card');
             const subtitle = document.getElementById('weatherSubtitle');
-            const weatherItems = document.querySelectorAll('.weather-item[data-weather-pane]');
+            const config = WEATHER_CONFIG[paneId];
 
-            if (paneId === 'pane-flight') {
+            if (!config) {
                 weatherCard.style.display = 'none';
                 return;
             }
 
             weatherCard.style.display = 'block';
             if (subtitle) {
-                subtitle.textContent = '已同步顯示目前日期的天氣預報與穿搭提醒。';
+                subtitle.textContent = `目前日期：${config.city} ${config.date}｜顯示 06:00 到 21:00 的逐小時溫度與降水機率。`;
             }
 
-            weatherItems.forEach(item => {
-                const isActive = item.dataset.weatherPane === paneId;
-                item.classList.toggle('hidden', !isActive);
-            });
+            if (weatherCache[paneId]) {
+                if (weatherCache[paneId].type === 'success') {
+                    renderWeatherSuccess(config, weatherCache[paneId]);
+                } else {
+                    renderWeatherFallback(config, weatherCache[paneId].message);
+                }
+                return;
+            }
+
+            setWeatherLoading(config);
+
+            if (!weatherPending[paneId]) {
+                weatherPending[paneId] = fetchWeather(config)
+                    .then(result => {
+                        weatherCache[paneId] = { type: 'success', ...result };
+                    })
+                    .catch(() => {
+                        weatherCache[paneId] = {
+                            type: 'fallback',
+                            message: '可能是 API 暫時失敗，或目前日期還不在 Open-Meteo 的可預報範圍內。'
+                        };
+                    })
+                    .finally(() => {
+                        delete weatherPending[paneId];
+                    });
+            }
+
+            await weatherPending[paneId];
+
+            if (activeWeatherPane !== paneId) {
+                return;
+            }
+
+            if (weatherCache[paneId].type === 'success') {
+                renderWeatherSuccess(config, weatherCache[paneId]);
+            } else {
+                renderWeatherFallback(config, weatherCache[paneId].message);
+            }
         }
 
         function switchMainTab(paneId, btnElement) {
